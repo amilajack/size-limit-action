@@ -48,6 +48,7 @@ async function run() {
       );
     }
 
+    const cmd = getInput("cmd");
     const skipStep = getInput("skip_step");
     const buildScript = getInput("build_script");
     const cleanScript = getInput("clean_script");
@@ -70,7 +71,8 @@ async function run() {
         buildScript,
         cleanScript,
         windowsVerbatimArguments,
-        directory
+        directory,
+        cmd
       );
 
       try {
@@ -108,7 +110,7 @@ async function run() {
         artifactName: ARTIFACT_NAME,
         branch: mainBranch,
         downloadPath: __dirname,
-        workflowEvent: 'push',
+        workflowEvent: "push",
         workflowName: `${process.env.GITHUB_WORKFLOW || ""}`,
       });
       base = JSON.parse(
@@ -124,7 +126,9 @@ async function run() {
       skipStep,
       buildScript,
       cleanScript,
-      windowsVerbatimArguments
+      windowsVerbatimArguments,
+      null,
+      cmd
     );
     try {
       current = limit.parseResults(output);

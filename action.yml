@@ -1,4 +1,4 @@
-name: "size-limit-action"
+name: "amilajack/size-limit-action"
 description: "size-limit action"
 author: "Andres Alvarez <a.alvarez.sor@gmail.com>"
 branding:
@@ -10,10 +10,10 @@ inputs:
     description: "a github access token"
   build_script:
     required: false
-    description: 'a custom npm script to build'
+    description: "a custom npm script to build"
   clean_script:
     required: false
-    description: 'a npm script to clean up build directory'
+    description: "a npm script to clean up build directory"
   skip_step:
     required: false
     description: 'which step to skip, either "install" or "build"'
@@ -32,6 +32,10 @@ inputs:
     required: false
     default: 0.0125
     description: "The percentage threshold for size changes before posting a comment"
+  cmd:
+    required: false
+    default: "npx size-limit --json"
+    description: "The command used to generate size-limit results"
 runs:
   using: "node16"
   main: "dist/index.js"
