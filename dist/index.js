@@ -18210,7 +18210,7 @@ const has_pnpm_1 = __importDefault(__nccwpck_require__(3974));
 const INSTALL_STEP = "install";
 const BUILD_STEP = "build";
 class Term {
-    execSizeLimit(skipStep, buildScript, cleanScript, windowsVerbatimArguments, directory) {
+    execSizeLimit(skipStep, buildScript, cleanScript, windowsVerbatimArguments, directory, cmd) {
         return __awaiter(this, void 0, void 0, function* () {
             const manager = (0, has_yarn_1.default)(directory)
                 ? "yarn"
@@ -18229,7 +18229,7 @@ class Term {
                     cwd: directory,
                 });
             }
-            const status = yield (0, exec_1.exec)("npx", ["size-limit", "--json"], {
+            const status = yield (0, exec_1.exec)(cmd, [], {
                 windowsVerbatimArguments,
                 ignoreReturnCode: true,
                 listeners: {
@@ -18241,7 +18241,7 @@ class Term {
             });
             if (cleanScript) {
                 yield (0, exec_1.exec)(`${manager} run ${cleanScript}`, [], {
-                    cwd: directory
+                    cwd: directory,
                 });
             }
             return {
@@ -18326,6 +18326,7 @@ function run() {
             if (!isMainBranch && !pr) {
                 throw new Error("No PR found. Only pull_request workflows are supported.");
             }
+            const cmd = getInput("cmd");
             const skipStep = getInput("skip_step");
             const buildScript = getInput("build_script");
             const cleanScript = getInput("clean_script");
@@ -18340,7 +18341,7 @@ function run() {
             const resultsFilePath = path_1.default.resolve(__dirname, RESULTS_FILE);
             if (isMainBranch) {
                 let base;
-                const { output: baseOutput } = yield term.execSizeLimit(null, buildScript, cleanScript, windowsVerbatimArguments, directory);
+                const { output: baseOutput } = yield term.execSizeLimit(null, buildScript, cleanScript, windowsVerbatimArguments, directory, cmd);
                 try {
                     base = limit.parseResults(baseOutput);
                 }
@@ -18366,7 +18367,7 @@ function run() {
             try {
                 // Ignore failures here as it is likely that this only happens when introducing size-limit
                 // and this has not been run on the main branch yet
-                yield (0, github_fetch_workflow_artifact_1.default)(octokit, Object.assign(Object.assign({}, repo), { artifactName: ARTIFACT_NAME, branch: mainBranch, downloadPath: __dirname, workflowEvent: 'push', workflowName: `${process.env.GITHUB_WORKFLOW || ""}` }));
+                yield (0, github_fetch_workflow_artifact_1.default)(octokit, Object.assign(Object.assign({}, repo), { artifactName: ARTIFACT_NAME, branch: mainBranch, downloadPath: __dirname, workflowEvent: "push", workflowName: `${process.env.GITHUB_WORKFLOW || ""}` }));
                 base = JSON.parse(yield fs_1.promises.readFile(resultsFilePath, { encoding: "utf8" }));
             }
             catch (error) {
@@ -18374,7 +18375,7 @@ function run() {
                 core.debug(error);
                 core.endGroup();
             }
-            const { status, output } = yield term.execSizeLimit(skipStep, buildScript, cleanScript, windowsVerbatimArguments);
+            const { status, output } = yield term.execSizeLimit(skipStep, buildScript, cleanScript, windowsVerbatimArguments, undefined, cmd);
             try {
                 current = limit.parseResults(output);
             }
